@@ -1,7 +1,7 @@
 {
   "name": "@astralis-os/notfetch",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "fetch instance",
   "author": {
     "name": "Astralis Open Source 🌚",
@@ -55,10 +55,10 @@
     "pretty": "pnpm type && pnpm lint && pnpm format"
   },
   "devDependencies": {
-    "@siberiacancode/eslint": "*",
-    "@siberiacancode/prettier": "*",
-    "@siberiacancode/tsconfig": "^1.2.0",
-    "@siberiacancode/vitest": "*",
+    "@astralis-os/eslint": "*",
+    "@astralis-os/prettier": "*",
+    "@astralis-os/tsconfig": "^1.0.0",
+    "@astralis-os/vitest": "*",
     "vitest": "4.0.16"
   },
   "lint-staged": {

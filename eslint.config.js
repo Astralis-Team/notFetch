@@ -1,5 +1,5 @@
-import { eslint } from '@siberiacancode/eslint';
+import { eslint } from "@astralis-os/eslint";
 
 export default eslint({
-  typescript: true
+  typescript: true,
 });

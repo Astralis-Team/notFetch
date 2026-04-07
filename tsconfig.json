@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@siberiacancode/tsconfig/tsconfig.bundler.json",
+  "extends": "@astralis-os/tsconfig/tsconfig.bundler.json",
   "compilerOptions": {
     "baseUrl": ".",
     "types": ["vitest/globals"],
