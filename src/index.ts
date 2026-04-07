@@ -1,20 +1,40 @@
 export type BaseUrl = string;
 
 export type ResponseParseFunction = (data: unknown) => Promise<unknown>;
-export type ResponseParseMode = 'arrayBuffer' | 'blob' | 'formData' | 'json' | 'raw' | 'text';
+export type ResponseParseMode =
+  | "arrayBuffer"
+  | "blob"
+  | "formData"
+  | "json"
+  | "raw"
+  | "text";
 export type ResponseParse = ResponseParseFunction | ResponseParseMode;
 
-export type RequestMethod = 'DELETE' | 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT';
+export type RequestMethod =
+  | "DELETE"
+  | "GET"
+  | "HEAD"
+  | "PATCH"
+  | "POST"
+  | "PUT";
 export type RequestBody = BodyInit | Record<string, any> | null | undefined;
 export interface RequestSearchParams {
-  [key: string]: boolean | number | string | number[] | string[] | null | undefined;
+  [key: string]:
+    | boolean
+    | number
+    | string
+    | number[]
+    | string[]
+    | null
+    | undefined;
 }
 
 export type ValidateStatus = (status: number) => boolean;
 
-export const DEFAULT_VALIDATE_STATUS: ValidateStatus = (status) => status >= 200 && status < 300;
+export const DEFAULT_VALIDATE_STATUS: ValidateStatus = (status) =>
+  status >= 200 && status < 300;
 
-export interface RequestOptions extends Omit<RequestInit, 'body' | 'method'> {
+export interface RequestOptions extends Omit<RequestInit, "body" | "method"> {
   baseURL?: BaseUrl;
   body?: RequestBody;
   context?: Record<string, any>;
@@ -54,10 +74,10 @@ export interface NotFetchResponse<Data> {
 }
 
 export type SuccessResponseFunction = <Data = any>(
-  response: NotFetchResponse<Data>
+  response: NotFetchResponse<Data>,
 ) => NotFetchResponse<Data> | Promise<NotFetchResponse<Data>>;
 export type SuccessRequestFunction = (
-  config: RequestConfig
+  config: RequestConfig,
 ) => Promise<RequestConfig> | RequestConfig;
 
 export class ResponseError extends Error {
@@ -66,7 +86,7 @@ export class ResponseError extends Error {
 
   constructor(
     message: string,
-    options: { request: RequestConfig; response: NotFetchResponse<any> }
+    options: { request: RequestConfig; response: NotFetchResponse<any> },
   ) {
     super(message, { cause: options });
     this.response = options.response;
@@ -96,7 +116,9 @@ export type NotFetchRequestConfig<Params = undefined> = Params extends undefined
   : { params: Params; config?: RequestOptions };
 
 export type ApiNotFetchRequest<Params, Response = any> = (
-  Params extends { [K in keyof Params]: undefined extends Params[K] ? never : any }[keyof Params]
+  Params extends {
+    [K in keyof Params]: undefined extends Params[K] ? never : any;
+  }[keyof Params]
     ? true
     : false
 ) extends true
@@ -116,14 +138,14 @@ class NotFetch {
     request: {
       use: (
         onSuccess?: SuccessRequestFunction,
-        onFailure?: FailureRequestFunction
+        onFailure?: FailureRequestFunction,
       ) => RequestInterceptor;
       eject: (interceptor: RequestInterceptor) => void;
     };
     response: {
       use: (
         onSuccess?: SuccessResponseFunction,
-        onFailure?: FailureResponseFunction
+        onFailure?: FailureResponseFunction,
       ) => ResponseInterceptor;
       eject: (interceptor: ResponseInterceptor) => void;
     };
@@ -131,12 +153,12 @@ class NotFetch {
 
   constructor(params?: NotFetchParams) {
     const {
-      baseURL = '',
+      baseURL = "",
       headers = {},
       parse,
-      validateStatus = DEFAULT_VALIDATE_STATUS
+      validateStatus = DEFAULT_VALIDATE_STATUS,
     } = params ?? {};
-    this.baseURL = baseURL ?? '';
+    this.baseURL = baseURL ?? "";
     this.headers = headers;
     this.parse = parse;
     this.validateStatus = validateStatus;
@@ -150,10 +172,11 @@ class NotFetch {
           return interceptor;
         },
         eject: (interceptor) => {
-          this.interceptorHandlers.request = this.interceptorHandlers.request?.filter(
-            (interceptorLink) => interceptorLink !== interceptor
-          );
-        }
+          this.interceptorHandlers.request =
+            this.interceptorHandlers.request?.filter(
+              (interceptorLink) => interceptorLink !== interceptor,
+            );
+        },
       },
       response: {
         use: (onSuccess, onFailure) => {
@@ -162,11 +185,12 @@ class NotFetch {
           return interceptor;
         },
         eject: (interceptor) => {
-          this.interceptorHandlers.response = this.interceptorHandlers.response?.filter(
-            (interceptorLink) => interceptorLink !== interceptor
-          );
-        }
-      }
+          this.interceptorHandlers.response =
+            this.interceptorHandlers.response?.filter(
+              (interceptorLink) => interceptorLink !== interceptor,
+            );
+        },
+      },
     };
   }
 
@@ -183,45 +207,50 @@ class NotFetch {
   }
 
   private prepareBody(body?: RequestBody) {
-    if (body instanceof FormData || body instanceof Blob || typeof body === 'string') return body;
+    if (
+      body instanceof FormData ||
+      body instanceof Blob ||
+      typeof body === "string"
+    )
+      return body;
     return JSON.stringify(body);
   }
 
   private async parseResponse<Data>(
     response: Response,
-    parse?: ResponseParse
+    parse?: ResponseParse,
   ): Promise<Data | undefined> {
     if (!response.body) return undefined;
 
-    if (typeof parse === 'function') {
+    if (typeof parse === "function") {
       return (await parse(response.body)) as Data;
     }
 
     const parseMethods = {
       raw: {
         parse: () => response.body,
-        match: 'raw'
+        match: "raw",
       },
       text: {
         parse: () => response.text(),
-        match: /text/
+        match: /text/,
       },
       json: {
         parse: () => response.json(),
-        match: /json/
+        match: /json/,
       },
       blob: {
         parse: () => response.blob(),
-        match: /(octet-stream|zip|pdf|image)/
+        match: /(octet-stream|zip|pdf|image)/,
       },
       formData: {
         parse: () => response.formData(),
-        match: /form-data/
+        match: /form-data/,
       },
       arrayBuffer: {
         parse: () => response.arrayBuffer(),
-        match: /array-buffer/
-      }
+        match: /array-buffer/,
+      },
     };
 
     if (parse) {
@@ -229,10 +258,12 @@ class NotFetch {
       return (await parser.parse()) as Data;
     }
 
-    const contentType = response.headers.get('content-type');
+    const contentType = response.headers.get("content-type");
     if (!contentType) return (await response.text()) as Data;
 
-    const parser = Object.values(parseMethods).find((entry) => contentType.match(entry.match));
+    const parser = Object.values(parseMethods).find((entry) =>
+      contentType.match(entry.match),
+    );
 
     if (!parser) return response.body as Data;
 
@@ -249,7 +280,9 @@ class NotFetch {
         if (value === undefined || value === null) continue;
 
         if (Array.isArray(value)) {
-          value.forEach((currentValue) => searchParams.append(key, currentValue.toString()));
+          value.forEach((currentValue) =>
+            searchParams.append(key, currentValue.toString()),
+          );
         } else {
           searchParams.set(key, value.toString());
         }
@@ -262,9 +295,12 @@ class NotFetch {
   private async runResponseInterceptors<Data>(
     initialResponse: Response,
     initialConfig: RequestConfig,
-    requestOptions: RequestOptions
+    requestOptions: RequestOptions,
   ) {
-    const data = await this.parseResponse<Data>(initialResponse, initialConfig.parse);
+    const data = await this.parseResponse<Data>(
+      initialResponse,
+      initialConfig.parse,
+    );
     let response = {
       data,
       url: initialResponse.url,
@@ -272,7 +308,7 @@ class NotFetch {
       status: initialResponse.status,
       statusText: initialResponse.statusText,
       config: initialConfig,
-      options: requestOptions
+      options: requestOptions,
     } as NotFetchResponse<Data>;
 
     if (!this.interceptorHandlers.response?.length) {
@@ -284,12 +320,12 @@ class NotFetch {
           status: response.status,
           statusText: response.statusText,
           config: initialConfig,
-          options: requestOptions
+          options: requestOptions,
         } as NotFetchResponse<Data>;
 
         throw new ResponseError(response.statusText, {
           request: initialConfig,
-          response: errorResponse
+          response: errorResponse,
         });
       }
 
@@ -302,16 +338,16 @@ class NotFetch {
         ? [
             {
               onSuccess: requestOptions.onResponseSuccess,
-              onFailure: requestOptions.onResponseFailure
-            }
+              onFailure: requestOptions.onResponseFailure,
+            },
           ]
-        : [])
+        : []),
     ]) {
       try {
         if (!this.validateStatus(initialResponse.status))
           throw new ResponseError(initialResponse.statusText, {
             request: initialConfig,
-            response
+            response,
           });
         if (!onSuccess) continue;
         response = await onSuccess(response);
@@ -329,7 +365,7 @@ class NotFetch {
 
   private async runRequestInterceptors(
     initialConfig: RequestConfig,
-    requestOptions: RequestOptions
+    requestOptions: RequestOptions,
   ) {
     let config = initialConfig;
 
@@ -341,10 +377,10 @@ class NotFetch {
         ? [
             {
               onSuccess: requestOptions.onRequestSuccess,
-              onFailure: requestOptions.onRequestFailure
-            }
+              onFailure: requestOptions.onRequestFailure,
+            },
           ]
-        : [])
+        : []),
     ]) {
       try {
         if (!onSuccess) continue;
@@ -363,7 +399,7 @@ class NotFetch {
   private async request<Data, R = NotFetchResponse<Data>>(
     endpoint: string,
     method: RequestMethod,
-    options: RequestOptions = {}
+    options: RequestOptions = {},
   ) {
     const { body, query, parse, baseURL, ...rest } = options;
     let url = `${baseURL ?? this.baseURL}${endpoint}`;
@@ -381,11 +417,15 @@ class NotFetch {
       headers: {
         ...this.headers,
         ...(body &&
-          !(body instanceof FormData || body instanceof Blob || typeof body === 'string') && {
-            'content-type': 'application/json'
+          !(
+            body instanceof FormData ||
+            body instanceof Blob ||
+            typeof body === "string"
+          ) && {
+            "content-type": "application/json",
           }),
-        ...(!!options?.headers && options.headers)
-      }
+        ...(!!options?.headers && options.headers),
+      },
     };
 
     const config = await this.runRequestInterceptors(defaultConfig, options);
@@ -397,56 +437,56 @@ class NotFetch {
 
   get<Data, Response = NotFetchResponse<Data>>(
     endpoint: string,
-    options: Omit<RequestOptions, 'body'> = {}
+    options: Omit<RequestOptions, "body"> = {},
   ) {
-    return this.request<Data, Response>(endpoint, 'GET', options);
+    return this.request<Data, Response>(endpoint, "GET", options);
   }
 
   head<Data, Response = NotFetchResponse<Data>>(
     endpoint: string,
-    options: Omit<RequestOptions, 'body'> = {}
+    options: Omit<RequestOptions, "body"> = {},
   ) {
-    return this.request<Data, Response>(endpoint, 'HEAD', options);
+    return this.request<Data, Response>(endpoint, "HEAD", options);
   }
 
   delete<Data, Response = NotFetchResponse<Data>>(
     endpoint: string,
-    options: Omit<RequestOptions, 'body'> = {}
+    options: Omit<RequestOptions, "body"> = {},
   ) {
-    return this.request<Data, Response>(endpoint, 'DELETE', options);
+    return this.request<Data, Response>(endpoint, "DELETE", options);
   }
 
   post<Data, Response = NotFetchResponse<Data>>(
     endpoint: string,
     body?: RequestBody,
-    options: RequestOptions = {}
+    options: RequestOptions = {},
   ) {
     options.body = body;
-    return this.request<Data, Response>(endpoint, 'POST', options);
+    return this.request<Data, Response>(endpoint, "POST", options);
   }
 
   put<Data, Response = NotFetchResponse<Data>>(
     endpoint: string,
     body?: RequestBody,
-    options: RequestOptions = {}
+    options: RequestOptions = {},
   ) {
     options.body = body;
-    return this.request<Data, Response>(endpoint, 'PUT', options);
+    return this.request<Data, Response>(endpoint, "PUT", options);
   }
 
   patch<Data, Response = NotFetchResponse<Data>>(
     endpoint: string,
     body?: RequestBody,
-    options: RequestOptions = {}
+    options: RequestOptions = {},
   ) {
     options.body = body;
-    return this.request<Data, Response>(endpoint, 'PATCH', options);
+    return this.request<Data, Response>(endpoint, "PATCH", options);
   }
 
   call<Data, Response = NotFetchResponse<Data>>(
     method: RequestMethod,
     url: string,
-    options?: RequestOptions
+    options?: RequestOptions,
   ) {
     return this.request<Data, Response>(url, method, options);
   }

@@ -1,7 +1,7 @@
 {
   "name": "@astralis-os/notfetch",
   "type": "module",
-  "version": "1.14.1",
+  "version": "1.0.0",
   "description": "fetch instance",
   "author": {
     "name": "Astralis Open Source 🌚",
@@ -17,7 +17,9 @@
   },
   "keywords": [
     "fetch",
-    "instance"
+    "instance",
+    "fetches",
+    "notFetch"
   ],
   "publishConfig": {
     "access": "public"
@@ -55,6 +57,7 @@
   "devDependencies": {
     "@siberiacancode/eslint": "*",
     "@siberiacancode/prettier": "*",
+    "@siberiacancode/tsconfig": "^1.2.0",
     "@siberiacancode/vitest": "*",
     "vitest": "4.0.16"
   },
@@ -63,5 +66,8 @@
       "prettier --write",
       "eslint --fix"
     ]
+  },
+  "dependencies": {
+    "tsdown": "^0.21.7"
   }
 }
