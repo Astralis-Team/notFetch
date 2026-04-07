@@ -1,0 +1,67 @@
+{
+  "name": "@astralis-os/notfetch",
+  "type": "module",
+  "version": "1.14.1",
+  "description": "fetch instance",
+  "author": {
+    "name": "Astralis Open Source 🌚",
+    "url": "https://github.com/Astralis-Team"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Astralis-Team/notFetch",
+  "repository": {
+    "url": "https://github.com/Astralis-Team/notFetch"
+  },
+  "bugs": {
+    "url": "https://github.com/Astralis-Team/notFetch/issues"
+  },
+  "keywords": [
+    "fetch",
+    "instance"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.mts",
+        "default": "./dist/esm/index.mjs"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.cts",
+        "default": "./dist/cjs/index.cjs"
+      }
+    }
+  },
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.mjs",
+  "types": "dist/esm/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "prepublishOnly": "pnpm type && pnpm build",
+    "build": "tsdown",
+    "unit-test": "vitest",
+    "lint": "eslint . --fix",
+    "lint-inspector": "npx @eslint/config-inspector",
+    "type": "tsc --noEmit",
+    "format": "prettier --write .",
+    "pretty": "pnpm type && pnpm lint && pnpm format"
+  },
+  "devDependencies": {
+    "@siberiacancode/eslint": "*",
+    "@siberiacancode/prettier": "*",
+    "@siberiacancode/vitest": "*",
+    "vitest": "4.0.16"
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  }
+}
